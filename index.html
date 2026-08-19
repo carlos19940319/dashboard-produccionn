@@ -5037,7 +5037,11 @@ async function guardarProduccionEnSupabase(result){
     porcentaje_scrap:Number(x.pct)||0,
     tiempo_scrap:Number(x.scrapTime)||0,
     runtime:Number(x.rtime)||0,
-    molde:(x.molde && x.molde !== '—') ? String(x.molde) : null
+    molde:(x.molde && x.molde !== '—') ? String(x.molde) : null,
+    clave:(x.key && x.key !== '—') ? String(x.key) : null,
+    cavidades:Number(x.cav)||0,
+    ciclo_actual:Number(x.cycle)||0,
+    ciclo_std:Number(x.stdCycle)||0
   }));
 
   // Reemplaza la publicación anterior por la nueva carga.
@@ -5056,24 +5060,24 @@ async function cargarProduccionDesdeSupabase(){
   const status=document.getElementById('scrapFileStatus');
   try{
     const {data,error}=await sb.from('producción')
-      .select('id,maquina,orden,scrap_pz,pz_buenas,porcentaje_scrap,tiempo_scrap,runtime,molde')
+      .select('id,maquina,orden,scrap_pz,pz_buenas,porcentaje_scrap,tiempo_scrap,runtime,molde,clave,cavidades,ciclo_actual,ciclo_std')
       .order('id',{ascending:true});
     if(error) throw error;
     if(!data || !data.length) return false;
 
     const records=data.map((x,i)=>({
       machine:String(x.maquina||''),
-      cav:'0',
-      key:'—',
+      cav:String(x.cavidades||0),
+      key:String(x.clave||'—'),
       molde:String(x.molde||'—'),
       order:String(x.orden||'—'),
       good:Number(x.pz_buenas)||0,
       scrap:Number(x.scrap_pz)||0,
       pct:Number(x.porcentaje_scrap)||0,
       rtime:Number(x.runtime)||0,
-      cycle:0,
+      cycle:Number(x.ciclo_actual)||0,
       scrapTime:Number(x.tiempo_scrap)||0,
-      stdCycle:0,
+      stdCycle:Number(x.ciclo_std)||0,
       cycGainLoss:0,
       row:i+1
     }));
