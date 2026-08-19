@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#070b10;color:#e7edf2;font-family:Inter,Segoe UI,Arial,sans-serif}
@@ -2590,6 +2589,129 @@ body::marker{display:none}
 }
 </style>
 
+
+<style id="scrap-mobile-all-columns-only">
+/* SOLO AJUSTE VISUAL DE LA TABLA SCRAP EN PANTALLAS PEQUEÑAS.
+   No cambia cálculos, datos, Supabase ni el diseño de escritorio. */
+@media (max-width:700px){
+  .scrap-main-grid .scrap-table-wrap{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:auto !important;
+    overflow-y:auto !important;
+    scrollbar-width:thin !important;
+  }
+  .scrap-main-grid .scrap-table{
+    width:100% !important;
+    min-width:0 !important;
+    table-layout:fixed !important;
+  }
+  .scrap-main-grid .scrap-table th,
+  .scrap-main-grid .scrap-table td{
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    word-break:break-word !important;
+    text-overflow:clip !important;
+  }
+  .scrap-main-grid .scrap-table th{
+    font-size:clamp(7px,2.1vw,9px) !important;
+    line-height:1.05 !important;
+    padding:6px 2px !important;
+  }
+  .scrap-main-grid .scrap-table td{
+    font-size:clamp(8px,2.35vw,10px) !important;
+    line-height:1.1 !important;
+    padding:7px 2px !important;
+  }
+  .scrap-main-grid .scrap-table th:nth-child(1),.scrap-main-grid .scrap-table td:nth-child(1){width:7% !important}
+  .scrap-main-grid .scrap-table th:nth-child(2),.scrap-main-grid .scrap-table td:nth-child(2){width:14% !important}
+  .scrap-main-grid .scrap-table th:nth-child(3),.scrap-main-grid .scrap-table td:nth-child(3){width:15% !important}
+  .scrap-main-grid .scrap-table th:nth-child(4),.scrap-main-grid .scrap-table td:nth-child(4){width:15% !important}
+  .scrap-main-grid .scrap-table th:nth-child(5),.scrap-main-grid .scrap-table td:nth-child(5){width:13% !important}
+  .scrap-main-grid .scrap-table th:nth-child(6),.scrap-main-grid .scrap-table td:nth-child(6){width:13% !important}
+  .scrap-main-grid .scrap-table th:nth-child(7),.scrap-main-grid .scrap-table td:nth-child(7){width:23% !important}
+}
+</style>
+
+
+<style id="scrap-final-fit-pc-mobile">
+/* =========================================================
+   SCRAP · AJUSTE FINAL DE ANCHO
+   Solo corrige la distribución visual de la tabla.
+   No modifica datos, cálculos, ciclos ni diseño general.
+   ========================================================= */
+.scrap-main-grid{
+  grid-template-columns:minmax(0,1fr) 365px !important;
+  gap:10px !important;
+  min-width:0 !important;
+}
+.scrap-main-grid .scrap-table-wrap{
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:hidden !important;
+  box-sizing:border-box !important;
+}
+.scrap-main-grid .scrap-table{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  table-layout:fixed !important;
+  box-sizing:border-box !important;
+}
+.scrap-main-grid .scrap-table th,
+.scrap-main-grid .scrap-table td{
+  box-sizing:border-box !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  padding-left:4px !important;
+  padding-right:4px !important;
+}
+/* Las 7 columnas ahora suman exactamente 100% */
+.scrap-main-grid .scrap-table th:nth-child(1),
+.scrap-main-grid .scrap-table td:nth-child(1){width:8% !important}
+.scrap-main-grid .scrap-table th:nth-child(2),
+.scrap-main-grid .scrap-table td:nth-child(2){width:16% !important}
+.scrap-main-grid .scrap-table th:nth-child(3),
+.scrap-main-grid .scrap-table td:nth-child(3){width:13% !important}
+.scrap-main-grid .scrap-table th:nth-child(4),
+.scrap-main-grid .scrap-table td:nth-child(4){width:15% !important}
+.scrap-main-grid .scrap-table th:nth-child(5),
+.scrap-main-grid .scrap-table td:nth-child(5){width:12% !important}
+.scrap-main-grid .scrap-table th:nth-child(6),
+.scrap-main-grid .scrap-table td:nth-child(6){width:13% !important}
+.scrap-main-grid .scrap-table th:nth-child(7),
+.scrap-main-grid .scrap-table td:nth-child(7){width:23% !important}
+
+/* El tiempo siempre queda dentro de su columna */
+.scrap-main-grid .scrap-table th:nth-child(7),
+.scrap-main-grid .scrap-table td:nth-child(7){
+  text-align:center !important;
+  font-variant-numeric:tabular-nums !important;
+}
+
+@media (min-width:951px){
+  .scrap-main-grid .scrap-table-wrap{
+    overflow-x:hidden !important;
+  }
+}
+
+@media (max-width:950px){
+  .scrap-main-grid{
+    grid-template-columns:1fr !important;
+  }
+  .scrap-main-grid .scrap-table-wrap{
+    overflow-x:auto !important;
+  }
+  .scrap-main-grid .scrap-table{
+    min-width:680px !important;
+  }
+  .scrap-main-grid .scrap-cycle-panel{
+    order:2;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -5017,93 +5139,6 @@ $("clearBtn").addEventListener("click",()=>{
 </script>
 
 
-<script id="supabase-production-connection">
-/* ============================================================
-   SUPABASE · PRODUCCIÓN
-   La clave publishable/anon es apta para usarse en el navegador.
-   La seguridad real la controla RLS en Supabase.
-   ============================================================ */
-const SUPABASE_URL = 'https://vgrptsjeonjpandwqxei.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_oGIYxJP7l8AZ-y6PD3NXXQ_Qqn4yIfI';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
-async function guardarProduccionEnSupabase(result){
-  const rows = (result?.records || []).map((x,i)=>({
-    id:i+1,
-    maquina:x.machine || '',
-    orden:(x.order && x.order !== '—') ? String(x.order) : null,
-    scrap_pz:Number(x.scrap)||0,
-    pz_buenas:Number(x.good)||0,
-    porcentaje_scrap:Number(x.pct)||0,
-    tiempo_scrap:Number(x.scrapTime)||0,
-    runtime:Number(x.rtime)||0,
-    molde:(x.molde && x.molde !== '—') ? String(x.molde) : null
-  }));
-
-  // Reemplaza la publicación anterior por la nueva carga.
-  const {error:delError}=await sb.from('producción').delete().gte('id',0);
-  if(delError) throw delError;
-
-  for(let i=0;i<rows.length;i+=500){
-    const lote=rows.slice(i,i+500);
-    const {error}=await sb.from('producción').insert(lote);
-    if(error) throw error;
-  }
-  return rows.length;
-}
-
-async function cargarProduccionDesdeSupabase(){
-  const status=document.getElementById('scrapFileStatus');
-  try{
-    const {data,error}=await sb.from('producción')
-      .select('id,maquina,orden,scrap_pz,pz_buenas,porcentaje_scrap,tiempo_scrap,runtime,molde')
-      .order('id',{ascending:true});
-    if(error) throw error;
-    if(!data || !data.length) return false;
-
-    const records=data.map((x,i)=>({
-      machine:String(x.maquina||''),
-      cav:'0',
-      key:'—',
-      molde:String(x.molde||'—'),
-      order:String(x.orden||'—'),
-      good:Number(x.pz_buenas)||0,
-      scrap:Number(x.scrap_pz)||0,
-      pct:Number(x.porcentaje_scrap)||0,
-      rtime:Number(x.runtime)||0,
-      cycle:0,
-      scrapTime:Number(x.tiempo_scrap)||0,
-      stdCycle:0,
-      cycGainLoss:0,
-      row:i+1
-    }));
-
-    const result={
-      records,
-      totalRows:records.length,
-      totalMachineRows:records.length,
-      activeRows:records.length,
-      ignoredNonMachine:0,
-      ignoredEmpty:0,
-      detectedColumns:{},
-      headerRow:-1
-    };
-    // render() vive dentro del módulo de análisis independiente.
-    // Lo exponemos de forma controlada para reutilizarlo al cargar datos desde Supabase.
-    if(typeof window.renderScrapResult !== 'function') throw new Error('renderScrapResult no está disponible');
-    window.renderScrapResult(result);
-    document.getElementById('scrapIndependentControls')?.classList.remove('hidden');
-    document.getElementById('scrapAnalysisModal')?.querySelector('.scrap-modal-box')?.classList.add('scrap-loaded');
-    if(status) status.textContent='✓ Datos compartidos cargados desde la base de datos · '+records.length+' registros';
-    return true;
-  }catch(err){
-    console.error('[SUPABASE] Error al cargar producción:',err);
-    if(status) status.textContent='⚠ No se pudieron cargar los datos compartidos: '+(err.message||err);
-    return false;
-  }
-}
-</script>
-
 <script id="independent-scrap-analysis-script">
 (function(){
   "use strict";
@@ -5603,9 +5638,6 @@ async function cargarProduccionDesdeSupabase(){
       `<br><b>FILAS AUXILIARES IGNORADAS:</b> ${result.ignoredNonMachine.toLocaleString('es-MX')}.`;
   }
 
-  // Permite que el módulo Supabase, que está en otro <script>,
-  // use exactamente el mismo renderizador sin cambiar el diseño.
-  window.renderScrapResult = render;
 
   async function analyze(){
     if(!scrapFile){
@@ -5620,13 +5652,8 @@ async function cargarProduccionDesdeSupabase(){
       const result=analyzeMatrix(matrix,scrapFile);
       render(result);
       $('scrapIndependentControls').classList.remove('hidden');
-
-      // Guarda la carga para que cualquier persona que abra la misma liga
-      // pueda ver exactamente los datos publicados.
-      $('scrapFileStatus').textContent='⏳ Publicando datos compartidos en Supabase...';
-      const guardados=await guardarProduccionEnSupabase(result);
       $('scrapAnalysisModal').querySelector('.scrap-modal-box').classList.add('scrap-loaded');
-      $('scrapFileStatus').textContent='✓ '+scrapFile.name+' · '+result.records.length+' registros encontrados · '+guardados+' publicados';
+      $('scrapFileStatus').textContent='✓ '+scrapFile.name+' · '+result.records.length+' registros encontrados';
       console.log('[SCRAP] Resultado completo:',result);
     }catch(err){
       console.error('[SCRAP] Error:',err);
@@ -5716,8 +5743,6 @@ async function cargarProduccionDesdeSupabase(){
       $('scrapIndependentBody').innerHTML='';
       $('scrapIndependentNote').innerHTML='';
     });
-    // Al abrir la página, recupera automáticamente la última carga compartida.
-    cargarProduccionDesdeSupabase();
   });
 })();
 </script>
@@ -6314,6 +6339,133 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   .scrap-modal-box.scrap-loaded .scrap-table td:nth-child(3){
     font-size:12px !important;
+  }
+}
+</style>
+
+
+<style id="scrap-compacto-sin-encimarse-final">
+/* =========================================================
+   SCRAP · COMPACTO PERO LEGIBLE
+   Solo ajusta distribución/espaciado visual.
+   No cambia datos, cálculos ni lógica.
+   ========================================================= */
+
+.scrap-main-grid{
+  grid-template-columns:minmax(0,1fr) 330px !important;
+  gap:7px !important;
+  min-width:0 !important;
+}
+
+/* La tabla usa todo el espacio disponible */
+.scrap-main-grid .scrap-table-wrap{
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:hidden !important;
+  box-sizing:border-box !important;
+}
+
+/* Las 7 columnas tienen espacio real y no se enciman */
+.scrap-main-grid .scrap-table{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  table-layout:fixed !important;
+  box-sizing:border-box !important;
+}
+
+/* Menos espacio lateral, pero conservando separación entre textos */
+.scrap-main-grid .scrap-table th,
+.scrap-main-grid .scrap-table td{
+  box-sizing:border-box !important;
+  padding-left:5px !important;
+  padding-right:5px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  text-align:center !important;
+  vertical-align:middle !important;
+}
+
+/* Distribución para las 7 columnas:
+   RANK | MÁQUINA | MOLDE | ORDEN | SCRAP PZ | % SCRAP | TIEMPO SCRAP */
+.scrap-main-grid .scrap-table th:nth-child(1),
+.scrap-main-grid .scrap-table td:nth-child(1){width:7% !important}
+
+.scrap-main-grid .scrap-table th:nth-child(2),
+.scrap-main-grid .scrap-table td:nth-child(2){width:15% !important}
+
+.scrap-main-grid .scrap-table th:nth-child(3),
+.scrap-main-grid .scrap-table td:nth-child(3){width:13% !important}
+
+.scrap-main-grid .scrap-table th:nth-child(4),
+.scrap-main-grid .scrap-table td:nth-child(4){width:16% !important}
+
+.scrap-main-grid .scrap-table th:nth-child(5),
+.scrap-main-grid .scrap-table td:nth-child(5){width:12% !important}
+
+.scrap-main-grid .scrap-table th:nth-child(6),
+.scrap-main-grid .scrap-table td:nth-child(6){width:13% !important}
+
+.scrap-main-grid .scrap-table th:nth-child(7),
+.scrap-main-grid .scrap-table td:nth-child(7){width:24% !important}
+
+/* El tiempo conserva espacio suficiente */
+.scrap-main-grid .scrap-table th:nth-child(7),
+.scrap-main-grid .scrap-table td:nth-child(7){
+  text-align:center !important;
+  font-variant-numeric:tabular-nums !important;
+}
+
+/* Rank pequeño para liberar espacio */
+.scrap-main-grid .scrap-rank{
+  width:23px !important;
+  height:23px !important;
+  font-size:10px !important;
+  margin:auto !important;
+}
+
+/* Filas un poco más compactas sin juntar los textos */
+.scrap-main-grid .scrap-table thead th{
+  padding-top:7px !important;
+  padding-bottom:7px !important;
+  line-height:1.15 !important;
+}
+
+.scrap-main-grid .scrap-table tbody td{
+  padding-top:7px !important;
+  padding-bottom:7px !important;
+  line-height:1.2 !important;
+}
+
+/* En pantallas medianas se reduce el panel, no el texto de la tabla */
+@media (max-width:1150px) and (min-width:951px){
+  .scrap-main-grid{
+    grid-template-columns:minmax(0,1fr) 310px !important;
+    gap:7px !important;
+  }
+
+  .scrap-main-grid .scrap-table th,
+  .scrap-main-grid .scrap-table td{
+    padding-left:4px !important;
+    padding-right:4px !important;
+  }
+}
+
+/* En celular se mantiene la tabla completa con desplazamiento horizontal */
+@media (max-width:950px){
+  .scrap-main-grid{
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  .scrap-main-grid .scrap-table-wrap{
+    overflow-x:auto !important;
+  }
+
+  .scrap-main-grid .scrap-table{
+    min-width:680px !important;
   }
 }
 </style>
