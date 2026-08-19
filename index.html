@@ -5041,8 +5041,16 @@ async function guardarProduccionEnSupabase(result){
   }));
 
   // Reemplaza la publicación anterior por la nueva carga.
+  // La publicación reemplaza la carga anterior.
+  // IMPORTANTE: esto requiere una política RLS DELETE para el rol public.
   const {error:delError}=await sb.from('producción').delete().gte('id',0);
-  if(delError) throw delError;
+  if(delError){
+    const msg=String(delError.message||delError);
+    if(/row-level security|permission|delete|policy/i.test(msg)){
+      throw new Error('Supabase bloqueó el borrado de la carga anterior. Crea una política RLS DELETE para public en producción (WITH CHECK no aplica a DELETE; usa USING (true)).');
+    }
+    throw delError;
+  }
 
   for(let i=0;i<rows.length;i+=500){
     const lote=rows.slice(i,i+500);
@@ -5624,7 +5632,8 @@ async function cargarProduccionDesdeSupabase(){
       console.log('[SCRAP] Resultado completo:',result);
     }catch(err){
       console.error('[SCRAP] Error:',err);
-      $('scrapFileStatus').textContent='❌ No se pudo leer el archivo: '+(err.message||err);
+      const message=err?.message||String(err);
+      $('scrapFileStatus').textContent='❌ '+message;
     }
   }
 
