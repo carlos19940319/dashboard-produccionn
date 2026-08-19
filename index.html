@@ -4676,10 +4676,10 @@ $("clearBtn").addEventListener("click",()=>{
    SCRAP · MODO COMPACTO DESPUÉS DE CARGAR ARCHIVO
    ========================================================= */
 .scrap-modal-box.scrap-loaded .scrap-upload{
-  margin:6px 20px 4px !important;
-  padding:5px 14px !important;
-  min-height:44px !important;
-  height:44px !important;
+  margin:8px 20px 6px !important;
+  padding:8px 16px !important;
+  min-height:58px !important;
+  height:58px !important;
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
@@ -4724,10 +4724,10 @@ $("clearBtn").addEventListener("click",()=>{
 }
 @media(max-width:600px){
   .scrap-modal-box.scrap-loaded .scrap-upload{
-    margin:5px 10px 4px !important;
-    padding:5px 9px !important;
-    height:40px !important;
-    min-height:40px !important;
+    margin:6px 10px 5px !important;
+    padding:7px 10px !important;
+    height:52px !important;
+    min-height:52px !important;
     gap:6px !important;
   }
   .scrap-modal-box.scrap-loaded .scrap-upload span{display:none !important}
@@ -5636,9 +5636,6 @@ async function cargarProduccionDesdeSupabase(){
     }
     scrapFile=file;
     $('scrapFileStatus').textContent='Archivo seleccionado: '+file.name;
-    // Al cargar un archivo, compacta inmediatamente esta zona
-    // para no empujar la tabla y los KPIs hacia abajo.
-    $('scrapAnalysisModal').querySelector('.scrap-modal-box').classList.add('scrap-loaded');
     analyze();
   }
 
