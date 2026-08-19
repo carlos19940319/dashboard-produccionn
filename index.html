@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#070b10;color:#e7edf2;font-family:Inter,Segoe UI,Arial,sans-serif}
@@ -4675,10 +4676,10 @@ $("clearBtn").addEventListener("click",()=>{
    SCRAP · MODO COMPACTO DESPUÉS DE CARGAR ARCHIVO
    ========================================================= */
 .scrap-modal-box.scrap-loaded .scrap-upload{
-  margin:8px 20px 6px !important;
-  padding:8px 16px !important;
-  min-height:58px !important;
-  height:58px !important;
+  margin:6px 20px 4px !important;
+  padding:5px 14px !important;
+  min-height:44px !important;
+  height:44px !important;
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
@@ -4723,10 +4724,10 @@ $("clearBtn").addEventListener("click",()=>{
 }
 @media(max-width:600px){
   .scrap-modal-box.scrap-loaded .scrap-upload{
-    margin:6px 10px 5px !important;
-    padding:7px 10px !important;
-    height:52px !important;
-    min-height:52px !important;
+    margin:5px 10px 4px !important;
+    padding:5px 9px !important;
+    height:40px !important;
+    min-height:40px !important;
     gap:6px !important;
   }
   .scrap-modal-box.scrap-loaded .scrap-upload span{display:none !important}
@@ -5015,6 +5016,90 @@ $("clearBtn").addEventListener("click",()=>{
 })();
 </script>
 
+
+<script id="supabase-production-connection">
+/* ============================================================
+   SUPABASE · PRODUCCIÓN
+   La clave publishable/anon es apta para usarse en el navegador.
+   La seguridad real la controla RLS en Supabase.
+   ============================================================ */
+const SUPABASE_URL = 'https://vgrptsjeonjpandwqxei.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_oGIYxJP7l8AZ-y6PD3NXXQ_Qqn4yIfI';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+async function guardarProduccionEnSupabase(result){
+  const rows = (result?.records || []).map((x,i)=>({
+    id:i+1,
+    maquina:x.machine || '',
+    orden:(x.order && x.order !== '—') ? String(x.order) : null,
+    scrap_pz:Number(x.scrap)||0,
+    pz_buenas:Number(x.good)||0,
+    porcentaje_scrap:Number(x.pct)||0,
+    tiempo_scrap:Number(x.scrapTime)||0,
+    runtime:Number(x.rtime)||0,
+    molde:(x.molde && x.molde !== '—') ? String(x.molde) : null
+  }));
+
+  // Reemplaza la publicación anterior por la nueva carga.
+  const {error:delError}=await sb.from('producción').delete().gte('id',0);
+  if(delError) throw delError;
+
+  for(let i=0;i<rows.length;i+=500){
+    const lote=rows.slice(i,i+500);
+    const {error}=await sb.from('producción').insert(lote);
+    if(error) throw error;
+  }
+  return rows.length;
+}
+
+async function cargarProduccionDesdeSupabase(){
+  const status=document.getElementById('scrapFileStatus');
+  try{
+    const {data,error}=await sb.from('producción')
+      .select('id,maquina,orden,scrap_pz,pz_buenas,porcentaje_scrap,tiempo_scrap,runtime,molde')
+      .order('id',{ascending:true});
+    if(error) throw error;
+    if(!data || !data.length) return false;
+
+    const records=data.map((x,i)=>({
+      machine:String(x.maquina||''),
+      cav:'0',
+      key:'—',
+      molde:String(x.molde||'—'),
+      order:String(x.orden||'—'),
+      good:Number(x.pz_buenas)||0,
+      scrap:Number(x.scrap_pz)||0,
+      pct:Number(x.porcentaje_scrap)||0,
+      rtime:Number(x.runtime)||0,
+      cycle:0,
+      scrapTime:Number(x.tiempo_scrap)||0,
+      stdCycle:0,
+      cycGainLoss:0,
+      row:i+1
+    }));
+
+    const result={
+      records,
+      totalRows:records.length,
+      totalMachineRows:records.length,
+      activeRows:records.length,
+      ignoredNonMachine:0,
+      ignoredEmpty:0,
+      detectedColumns:{},
+      headerRow:-1
+    };
+    render(result);
+    document.getElementById('scrapIndependentControls')?.classList.remove('hidden');
+    document.getElementById('scrapAnalysisModal')?.querySelector('.scrap-modal-box')?.classList.add('scrap-loaded');
+    if(status) status.textContent='✓ Datos compartidos cargados desde la base de datos · '+records.length+' registros';
+    return true;
+  }catch(err){
+    console.error('[SUPABASE] Error al cargar producción:',err);
+    if(status) status.textContent='⚠ No se pudieron cargar los datos compartidos: '+(err.message||err);
+    return false;
+  }
+}
+</script>
 
 <script id="independent-scrap-analysis-script">
 (function(){
@@ -5529,8 +5614,13 @@ $("clearBtn").addEventListener("click",()=>{
       const result=analyzeMatrix(matrix,scrapFile);
       render(result);
       $('scrapIndependentControls').classList.remove('hidden');
+
+      // Guarda la carga para que cualquier persona que abra la misma liga
+      // pueda ver exactamente los datos publicados.
+      $('scrapFileStatus').textContent='⏳ Publicando datos compartidos en Supabase...';
+      const guardados=await guardarProduccionEnSupabase(result);
       $('scrapAnalysisModal').querySelector('.scrap-modal-box').classList.add('scrap-loaded');
-      $('scrapFileStatus').textContent='✓ '+scrapFile.name+' · '+result.records.length+' registros encontrados';
+      $('scrapFileStatus').textContent='✓ '+scrapFile.name+' · '+result.records.length+' registros encontrados · '+guardados+' publicados';
       console.log('[SCRAP] Resultado completo:',result);
     }catch(err){
       console.error('[SCRAP] Error:',err);
@@ -5546,6 +5636,9 @@ $("clearBtn").addEventListener("click",()=>{
     }
     scrapFile=file;
     $('scrapFileStatus').textContent='Archivo seleccionado: '+file.name;
+    // Al cargar un archivo, compacta inmediatamente esta zona
+    // para no empujar la tabla y los KPIs hacia abajo.
+    $('scrapAnalysisModal').querySelector('.scrap-modal-box').classList.add('scrap-loaded');
     analyze();
   }
 
@@ -5620,6 +5713,8 @@ $("clearBtn").addEventListener("click",()=>{
       $('scrapIndependentBody').innerHTML='';
       $('scrapIndependentNote').innerHTML='';
     });
+    // Al abrir la página, recupera automáticamente la última carga compartida.
+    cargarProduccionDesdeSupabase();
   });
 })();
 </script>
